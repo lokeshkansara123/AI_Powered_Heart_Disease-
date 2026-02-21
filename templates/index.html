@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="main-layout">
+
+
+<div class="left-panel">
+
+<h2>🫀 AI Heart Doctor</h2>
+
+<div class="ecg-monitor">
+    <div class="ecg-line"></div>
+</div>
+
+<select id="lang">
+<option value="en">English</option>
+<option value="hi">Hindi</option>
+</select>
+
+<button class="primary-btn" onclick="predict()">🧠 Predict Heart Risk</button>
+
+
+
+<div class="gauge-container">
+<div class="gauge-circle">
+<div id="needle"></div>
+</div>
+<div id="gaugeText">Waiting...</div>
+</div>
+
+</div>
+
+
+
+<div class="right-panel">
+
+<h3>🖼️ AI Heart Image Scan</h3>
+
+<div id="dropArea" class="drop-area">
+Drag & Drop Image Here
+<br>or<br>
+<input type="file" id="imgUpload" onchange="previewImage(event)">
+</div>
+
+<img id="preview" class="preview"/>
+
+<button class="primary-btn" onclick="scan()">🔍 Scan Image</button>
+
+<div id="scanStatus"></div>
+
+</div>
+
+</div>
+
+<script>
+
+
+function scan(){
+
+let file=document.getElementById("imgUpload").files[0];
+
+document.getElementById("scanStatus").innerText =
+"🧠 AI Doctor scanning...";
+
+let formData=new FormData();
+formData.append("image",file);
+
+fetch("/scan",{method:"POST",body:formData})
+.then(r=>r.json())
+.then(d=>{
+
+console.log("SCAN RESPONSE:", d);   // 🔥 DEBUG
+
+document.getElementById("scanStatus").innerText =
+d.scan_result+" | "+d.risk+"%";
+
+
+updateGauge(d.risk);
+
+});
+}
+
+
+
+
+function updateGauge(risk){
+
+let needle=document.getElementById("needle");
+
+let angle = (risk/100)*180 - 90;
+
+needle.style.transform="rotate("+angle+"deg)";
+}
+
+
+
+function previewImage(event){
+
+let img=document.getElementById("preview");
+img.src = URL.createObjectURL(event.target.files[0]);
+img.style.display="block";
+}
+
+
+
+function scan(){
+
+let file=document.getElementById("imgUpload").files[0];
+
+document.getElementById("scanStatus").innerText =
+"🧠 AI Doctor scanning...";
+
+let formData=new FormData();
+formData.append("image",file);
+
+fetch("/scan",{method:"POST",body:formData})
+.then(r=>r.json())
+.then(d=>{
+
+document.getElementById("scanStatus").innerText =
+d.scan_result+" | "+d.risk+"%";
+
+updateGauge(d.risk);
+
+});
+}
+
+</script>
+
+</body>
+</html>
